@@ -35,7 +35,9 @@ samples <- data.frame(
 rownames(samples) <- samples$sample
 samples
 
-files <- file.path(samples$sample, "abundance.tsv")
+files <- file.path("kallisto_output",
+                   samples$sample,
+                   "abundance.tsv")
 names(files) <- samples$sample
 
 files

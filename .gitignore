@@ -4,3 +4,5 @@
 .Ruserdata
 kallisto_output/*/*.h5 
 kallisto_output/*/run_info.json 
+*.Rproj
+.Rproj.user/
