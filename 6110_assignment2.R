@@ -1,6 +1,6 @@
 #Assignment 2
 #Thomas Furtado
-setwd("C:/Users/tfurt/OneDrive/Documents/R folder/kallisto_output")
+
 
 #Necessary Packages
 install.packages("BiocManager")
@@ -137,6 +137,3 @@ p <- dotplot(ego, showCategory = 10, title = "GO Biological Processes")
 p <- p + theme(axis.text.y = element_text(size = 8))
 
 p
-
-getwd()
-list.files()
