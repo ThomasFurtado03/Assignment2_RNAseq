@@ -1,0 +1,6 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+kallisto_output/*/*.h5 
+kallisto_output/*/run_info.json 
