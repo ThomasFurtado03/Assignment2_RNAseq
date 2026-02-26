@@ -1,0 +1,20 @@
+#SRA collected with wget
+
+wget https://ftp.ensembl.org/pub/release-110/fasta/saccharomyces_cerevisiae/cdna/Saccharomyces_cerevisiae.R64-1-1.cdna.all.fa.gz
+
+gunzip Saccharomyces_cerevisiae.R64-1-1.cdna.all.fa.gz
+
+kallisto index -i yeast_transcripts.idx Saccharomyces_cerevisiae.R64-1-1.cdna.all.fa
+
+for srr in SRR10551665 SRR10551664 SRR10551663 SRR10551662 SRR10551661 SRR10551660 SRR10551659 SRR10551658 SRR10551657
+do
+kallisto quant \
+-i ref/yeast_transcripts.idx \
+-o kallisto_output/$srr \
+--single -l 50 -s 10 \
+-t 4 \
+fastq/${srr}.fastq.gz
+done
+
+#Collecting results from narval to local computer for R analysis
+scp -r tfurtado@narval.computecanada.ca:/scratch/tfurtado/assignment2/kallisto_output .
