@@ -1,6 +1,6 @@
 #Assignment 2
 #Thomas Furtado
-
+sessionInfo()
 
 #Necessary Packages
 install.packages("BiocManager")
@@ -109,7 +109,9 @@ head(rownames(res_Mature_vs_Early))
 res_df <- as.data.frame(res_Mature_vs_Early)
 
 sig_genes <- rownames(res_df)[
-  which(res_df$padj > 0.05 & abs(res_df$log2FoldChange) > 1)
+  which(!is.na(res_df$padj) & 
+          res_df$padj < 0.05 & 
+          abs(res_df$log2FoldChange) > 1)
 ]
 
 length(sig_genes)
@@ -134,8 +136,13 @@ ego <- enrichGO(
 
 nrow(as.data.frame(ego))
 
+write.csv(as.data.frame(ego), "results/GO_ORA_BP_Mature_vs_Early.csv", row.names = FALSE)
+
+
 #Functional enrichment figure
 p <- dotplot(ego, showCategory = 10, title = "GO Biological Processes")
 p <- p + theme(axis.text.y = element_text(size = 8))
 
 p
+
+ggsave("results/Figure_GO_Dotplot_Top10.png", plot = p, width = 7, height = 5, dpi = 300)
