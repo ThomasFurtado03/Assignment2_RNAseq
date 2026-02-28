@@ -1,1 +1,77 @@
-# Assignment2_RNAseq
+**INTRODUCTION**
+
+_Saccharomyces cerevisiae_ can move from planktonic growth to structured multicellular communities such as biofilms. These developmental transitions involve significant transcriptional changes that regulate adhesion, morphology, stress responses, and metabolism One key regulator is FLO11, a cell surface glycoprotein required for invasive growth, and biofilm formation (Lo & Dranginis, 2017). Flor (biofilm-forming) strains, in particular, show distinct cell wall remodeling and surface protein expression which promotes biofilm formation at the air-liquid interface (Moreno-García et al., 2020). Transcriptomic profiling has shown that these developmental states are associated with coordinated changes in many genes which are involved in cell adhesion, morphogenesis, and metabolic adaptation (Mardanov et al., 2020).
+
+RNA-seq allows for quantitative measure of these genome-wide transcriptional changes. In this study, transcript abundances were estimated using _kallisto_, which performs fast and accurate pseudoalignment of reads. It does so using a reference transcriptome while maintaining quantification accuracy that's comparable to alignment-based approaches (Bray et al., 2016). Transcript-level estimates were imported and summarized for gene-level analysis using established workflows.
+
+Differential expression analysis was done using _DESeq2_, which models count data using a binomial framework, and improves stability using shrinkage estimation or dispersion (Love et al., 2014). This approach is particularly applicable for experiments with limited biological replicates, as it shares information across genes to provide reliable estimates of variance (Love et al., 2014).
+
+To interpret biological meaning from differentially expressed genes, Gene Ontology (GO) enrichment analysis was conducted using _clusterProfiler,_ which statistically tests for overrepresented biological processes and controls false discovery rates (Yu et al., 2012). This allows for identification of functional systems which underly transcriptional changes.
+
+The objective of this study was to characterize transcriptional differences across developmental stages of yeast biofilm formation, and to identify any enriched biological processes corresponding to these differences. By using robust statistical modeling along with functional enrichment analysis, this study aims to connect differential gene expression patterns to known mechanisms of biofilm development.
+
+**METHODS**
+
+Single-end RNA-seq data from nine _Sacchromyces cerevisiae_ samples (three Early, three Thin, three Mature : SRR10551665, SRR10551664, SRR10551663, SRR10551662, SRR10551661, SRR10551660, SRR10551659, SRR10551658, and SRR10551657) were obtained from the European Nucleotide Archive (ERA). Transcript quantification was performed against the _S. cerevisiae_ R64-1-1 reference transcriptome collected from Ensembl (Saccharomyces_cerevisiae.R64-1-1.cdna.all.fa.gz).
+
+Transcript abundances were estimated using kallisto (version 0.51.1) (Bray et al., 2016). An index was built from the Ensembl release 110 transcriptome. Quantification was performed in single-end mode with explicitly specified fragment length (mean = 50 bp, sd = 10 bp). All other parameters were performed as default.
+
+Transcript-level abundance estimates (abundance.tsv) were then imported into R (version 4.5.1) using tximport package (Bioconductor). Data were imported with type = "kallisto" and transcript-counts counts were retained (txOut = TRUE). Differential expression analysis was done using DESeq2 (version 1.48.1) (Love et al., 2014). The design formula specified condition as the independent variable ( ~ condition), with Early set as the reference level. Transcripts with total counts fewer than 10 across all samples were filtered. Differential expression was tested using the standard SESeq2 workflow, and p-values were adjusted. Three contrasts were evaluated: Thin vs Early, Mature vs Early, and Mature vs Thin.
+
+For visualization, variance-stabilizing transformation was applied using vst(dds, blind = FALSE). Principal component analysis (PCA) was generated from transformed values to assess sample separation by condition. A heatmap was produced for the top 20 features ranked by adjusted p-value in the Mature vs Early comparison using VST-transformed values scaled by row.
+
+Functional enrichment was performed using clusterProfiler (version 1.16.0) (Yu et al., 2012) with ord.Sc.sgd.db. Genes were defined as differentially expressed for enrichment if they met padj &lt; 0.05 and log2FoldChange &gt; 1, using the full set of tested IDs as the background set. This was done after excluding any NA adjusted p-values. Enrichment testing used pvalueCutoff = 0.05 and qvalueCutoff = 0.2. The results were summarized in a dot plot showing the top 10 GO terms.
+
+**RESULTS**
+
+**Global Transcriptional Variation Across Biofilm Stages**
+
+PCA of variance-stabilized counts revealed clear separation of samples by biofilm stage (Figure 1). PC1 explained 71% of the total variance, and separated Early, Thin, and Mature samples along the axis. It showed Mature samples clustering distinctly apart from Early samples. PC2 explained 24% of variance and further separated Thin samples from the other conditions. Replicates clustered tightly within each condition, showing strong reproducibility and stage-specific differences in transcription.
+
+**Differential Gene Expression**
+
+Differential expression analysis identified widespread transcriptional changes across biofilm stages. In the Thin vs Early comparison, 1,328 transcripts were upregulated and 1,267were downregulated (padj < 0.1 , 6,339 tested).
+
+The Mature vs Early comparison showed the largest shift, with 1,819 transcripts upregulated and 1,718 downregulated. In the Mature vs Thin comparison, 1,506 transcripts were upregulated and 1,424 were downregulated. These results indicate that substantial remodeling of gene expression occurs as biofilms transition from Early to Mature stages. A heatmap of the top 20 differentially expressed transcripts (ranked by padj in Mature vs Early comparison) showed clear clustering by condition (Figure 2). Mature and Early samples showed opposing expression patters for many top transcripts, supporting the idea of strong stage-dependent regulation of transcription.
+
+**Functional Enrichment of Differentially Expressed Genes**
+
+Using a significance threshold of padj &lt; 0.05 and logFoldChange &gt; 1, 2,071 transcripts were identified as differentially expressed in the Mature vs Early comparison used for Gene Ontology (GO) over-representation analysis. GO enrichment analysis revealed significant enrichment of biological processes associated with metabolism and energy production (Figure 3). The most significantly enriched term was _transmembrane transport_ (211/1875 genes, padj = 5.52 x 10<sup>\-6</sup>). This was followed by processes that are related to energy and metabolism, including _generation of precursor metabolites and energy_, _ATP metabolic proces_ses, and other categories regarding. Metabolism. Additional enriched categories include nucleotide triphosphate metabolic processes, which indicates changes in energy and nucleotide metabolism during maturation of the biofilm.
+
+**DISCUSSION**
+
+This dataset shows a large transcriptional shift across biofilm development stages, with the strongest differences observed between Mature and Early biofilms. In the DESeq2 comparison of Mature vs Early, thousands of genes chain in expression (1,819 upregulated and 1,718 downregulated at padj < 0.1). This indicated that maturation is associated with large-scale cellular reprogramming, rather than a small set of changes. This pattern is consistent with the time course of the flor biofilm (Mardanov et al., 2020). Mardanov et al. also reported that the number of differentially expressed genes increases as biofilm maturation progresses, with the largest differences seen when comparing Mature biofilm to the Early stage.
+
+The GO over-representation analysis (Mature vs Early, padj &lt; 0.5, lof2FC &gt; 1) was dominated by terms related to transport and central metabolism. This included transmembrane transport, generation of precursor metabolites, ATP metabolic processes, and several carboxylic acid metabolic processes. This suggests that mature biofilm cells undergo significant repurposing of nutrient movement and energy metabolism. This interpretation aligns closely with Mardanov et al., who note strong changes in carbohydrate and energy metabolism during flor development, and interpret these changes as part of the transition to using non-fermentative carbon sources during biofilm maturation.
+
+Looking at the most significant mature vs early DE genes supports this functional interpretation. Several of the strongest downregulated genes include YJL052W (log2FC ≈ −5.37), YGL055W (≈ −4.66), YCR012W (≈ −4.79), and YAL038W (≈ −3.20). Several of the strongest upregulated genes include YNR073C (≈ +8.15), YNR071C (≈ +9.08), YNR072W (≈ +5.99), and YIR019C (≈ +5.43). The combination of very large effect sizes in both directions and strong enrichment for metabolism/energy/transport processes support the idea that maturation involves coordinated induction of specific metabolic programs, and repression of others (Moreno-García et al., 2020). This behaves well in line with the metabolic shift framing used in transcriptome studies of yeast during transitions between growth states. In particular, the transition from fermentative growth to respiratory metabolism shown in other genome-wide expression studies (DeRisi et al., 1997).
+
+The top GO term in the enrichment results was transmembrane transport. This result suggests that transporters and membrane movement processes are a key direction of change between Early and Mature stages. Mardanov et al. similarly report significant changes in transporter gene expression during flor development. This was observed alongside widespread downregulation of many transporter classes at maturity, and selective upregulation of some high-affinity systems, which they describe as consistent with environments having significant nutrient limitation and altered carbon source usage in the mature velum (Moreno-García et al., 2020). The enrichment results here support the same conclusion: transport remodeling is not a minor detail, instead it's one of the most overrepresented functional themes in a mature biofilm.
+
+Biofilm development involves coordinated, and system level rewiring. Beyond individual pathways, the magnitude of differential expression indicates a large-scale transition. Mature vs Early shows larger overall change than Thin vs Early in the results, which is consistent with the idea that intermediate stages are transitional, but the mature biofilm represents a newly developed and distinct physiological endpoint (Moreno-García et al., 2020). Mardanov et al., also identify a small subset of genes that increase or decrease specifically at the Thin stage, but also emphasize that most genes follow a unidirectional trend during the transition from Early, to Thin, to Mature. The overall DEG patterns are also consistent with this style of progression, that being a large signal between Mature vs Early, and substantial differences in Mature vs Thin as well.
+
+Biofilm formation in yeast is known to involve both environmental responses and organized community behaviour. Brückner & Mösch review how biofilm growth is shaped by nutrient gradients and stress conditions, leading to spatial and temporal heterogeneity and coordinated regulation of adhesion processes within the biofilm. Given the large scale changes observed in this study, it's clear that the results support the idea that maturation comes with a broad reprogramming which likely reflects changes in nutrient availability and surface related growth conditions of the biofilm.
+
+**Confidence and limitations**
+
+This computational approach is consistent with standard bulk RNA-seq workflows. Kallisto provides transcript quantification through pseudoalignment, and DESeq2 provides differential expression testing with multiple corrections through adjusted p-values. These tools are widely used and well supported in the literature, which provides confidence that the large-scale transcriptional differences observed here are not due to unusual or inadequate methodology (Bray et al., 2016) (Love et al., 2014). However, read level QC was not performed in this study, and should be rightfully noted as a possible limitation. However, the clear stage-wise structure in the PCA, and the strong coherent functional enrichment signals suggest the observed patterns are in fact biologically meaningful.
+
+To summarize, the Mature vs Early comparison indicates that flor biofilm maturation is associated with significant transcriptional reprogramming, with enriched processes strongly associated with metabolic/energy processes and transmembrane transport. These results agree with published flor biofilm transcriptome work, which shows that maturation is a transition toward oxidative and non-fermentative processes under nutrient limitation and stress during velum growth (Mardanov et al., 2020). The results are also compatible with other broad-scale models of yeast biofilm development where changing environmental conditions drive targeted shifts in metabolism, transport, and culture-wide physiology (Brückner & Mösch, 2012) (DeRisi et al., 1997).
+
+References
+
+Bray, N. L., Pimentel, H., Melsted, P., & Pachter, L. (2016). Near-optimal probabilistic RNA-seq quantification. _Nature Biotechnology_, _34_(5), 525-527. <https://doi.org/10.1038/nbt.3519>
+
+Love, M. I., Huber, W., & Anders, S. (2014). Moderated estimation of fold change and dispersion for RNA-seq data with deseq2. _Genome Biology_, _15_(12). <https://doi.org/10.1186/s13059-014-0550-8>
+
+Lo, W.-S., & Dranginis, A. M. (1998). The cell surface flocculin flo11 is required for pseudohyphae formation and invasion by_saccharomyces cerevisiae_. _Molecular Biology of the Cell_, _9_(1), 161-171. <https://doi.org/10.1091/mbc.9.1.161>
+
+Moreno-García, J., Coi, A. L., Zara, G., García-Martínez, T., Mauricio, J. C., & Budroni, M. (2018). Study of the role of the covalently linked cell wall protein (CCW14P) and yeast glycoprotein (YGP1P) within biofilm formation in a flor yeast strain. _FEMS Yeast Research_, _18_(2). <https://doi.org/10.1093/femsyr/foy005>
+
+Mardanov, A. V., Eldarov, M. A., Beletsky, A. V., Tanashchuk, T. N., Kishkovskaya, S. A., & Ravin, N. V. (2020). Transcriptome profile of yeast strain used for biological wine aging revealed dynamic changes of gene expression in course of Flor Development. _Frontiers in Microbiology_, _11_. <https://doi.org/10.3389/fmicb.2020.00538>
+
+Yu, G., Wang, L.-G., Han, Y., & He, Q.-Y. (2012). Clusterprofiler: An R package for comparing biological themes among gene clusters. _OMICS: A Journal of Integrative Biology_, _16_(5), 284-287. <https://doi.org/10.1089/omi.2011.0118>
+
+DeRisi, J. L., Iyer, V. R., & Brown, P. O. (1997). Exploring the metabolic and genetic control of gene expression on a genomic scale. _Science_, _278_(5338), 680-686. <https://doi.org/10.1126/science.278.5338.680>
+
+Brückner, S., & Mösch, H.-U. (2012). Choosing the right lifestyle: Adhesion and development in_saccharomyces cerevisiae_. _FEMS Microbiology Reviews_, _36_(1), 25-58. <https://doi.org/10.1111/j.1574-6976.2011.00275.x>
