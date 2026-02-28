@@ -24,15 +24,31 @@ Functional enrichment was performed using clusterProfiler (version 1.16.0) (Yu e
 
 **RESULTS**
 
+![Figure 1: PCA of RNA-seq samples](Results/PCA_figure.png)
+
+**Figure 1. Principal component analysis (PCA) of RNA-seq samples across biofilm stages.**  
+PCA was performed on variance-stabilized counts from DESeq2. Samples cluster by developmental stage (Early, Thin, Mature), with PC1 explaining 71% of total variance and clearly separating Mature from Early samples. PC2 explains 24% of variance and distinguishes Thin samples from the other stages. Tight clustering within groups indicates strong biological reproducibility and stage-specific transcriptional identities.
+
 **Global Transcriptional Variation Across Biofilm Stages**
 
 PCA of variance-stabilized counts revealed clear separation of samples by biofilm stage (Figure 1). PC1 explained 71% of the total variance, and separated Early, Thin, and Mature samples along the axis. It showed Mature samples clustering distinctly apart from Early samples. PC2 explained 24% of variance and further separated Thin samples from the other conditions. Replicates clustered tightly within each condition, showing strong reproducibility and stage-specific differences in transcription.
+
+
+![Figure 2: Heatmap of top DE genes](Results/Heatmap.png)
+
+**Figure 2. Heatmap of the top 20 most significantly differentially expressed genes (Mature vs Early).**  
+Hierarchical clustering was performed on normalized expression values for the top 20 genes ranked by adjusted p-value. Samples cluster according to developmental stage, with Mature samples showing strong induction of genes such as YNR071C, YNR072W, and YNR073C, and repression of genes including YJL052W and YGL055W. The clear stage-dependent clustering supports substantial transcriptional reprogramming during biofilm maturation.
 
 **Differential Gene Expression**
 
 Differential expression analysis identified widespread transcriptional changes across biofilm stages. In the Thin vs Early comparison, 1,328 transcripts were upregulated and 1,267were downregulated (padj < 0.1 , 6,339 tested).
 
 The Mature vs Early comparison showed the largest shift, with 1,819 transcripts upregulated and 1,718 downregulated. In the Mature vs Thin comparison, 1,506 transcripts were upregulated and 1,424 were downregulated. These results indicate that substantial remodeling of gene expression occurs as biofilms transition from Early to Mature stages. A heatmap of the top 20 differentially expressed transcripts (ranked by padj in Mature vs Early comparison) showed clear clustering by condition (Figure 2). Mature and Early samples showed opposing expression patters for many top transcripts, supporting the idea of strong stage-dependent regulation of transcription.
+
+![Figure 3: GO Biological Process enrichment](Results/Figure_GO_Dotplot_Top10.png)
+
+**Figure 3. Gene Ontology (GO) biological process enrichment for genes differentially expressed in Mature vs Early biofilm.**  
+Over-representation analysis was performed using clusterProfiler on genes with padj < 0.05 and |log2FC| > 1. Dot size represents gene count per GO term, and color indicates adjusted p-value. Enriched terms include transmembrane transport, organic/carboxylic acid metabolic processes, ATP metabolic process, and generation of precursor metabolites and energy, highlighting extensive metabolic and transport remodeling during biofilm maturation.
 
 **Functional Enrichment of Differentially Expressed Genes**
 
